@@ -1,5 +1,4 @@
-# Pull Zulu8 image.
-FROM azul/zulu-openjdk:8
+FROM mcroft/micro-java
 
 # Maintainer
 # ----------
@@ -14,22 +13,21 @@ ENV HZ_CONFIG https://gist.githubusercontent.com/mikecroft/b42077bb540711e7ff18/
 
 # Install packages on ubuntu base image
  RUN \
-  apt-get update && \
-  apt-get install -y wget && \
-  apt-get install -y software-properties-common python-software-properties
+  apk --update add wget #software-properties-common python-software-properties
 
 
 # Add payara user, download payara micro build. Download sample war app and package on image.
-RUN useradd -b /opt -m -s /bin/bash payara && echo payara:payara | chpasswd
-RUN cd /opt && wget $PAYARA_PKG -O $PKG_FILE_NAME
+RUN adduser -D -s /bin/sh payara
+RUN echo payara:payara | chpasswd
+
 RUN mkdir -p $DEPLOY_DIR
 RUN chown -R payara:payara /opt
+RUN cd /opt && wget --no-check-certificate $PAYARA_PKG -O $PKG_FILE_NAME
 
 # Download resources
-RUN wget $JCACHE_WAR -P $DEPLOY_DIR
-RUN wget $HZ_CONFIG -P /opt
+RUN wget --no-check-certificate $JCACHE_WAR -P $DEPLOY_DIR
+RUN wget --no-check-certificate $HZ_CONFIG -P /opt
 
 # Set up payara user and the home directory for the user
 USER payara
 WORKDIR /opt
-ENTRYPOINT ["java", "-jar", "payara-micro.jar", "--deploymentDir", $DEPLOY_DIR]
