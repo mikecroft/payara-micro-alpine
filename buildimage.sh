@@ -9,6 +9,6 @@ then
     echo "Build failed!"
 else
     echo "The payara-micro docker image has been built."
-    echo "To start a new container, execute: docker run -i -t payara:micro.jcache"
+    echo "To start a new container, execute: docker run -it payara:micro.jcache"
 fi
 
